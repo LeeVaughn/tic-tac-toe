@@ -3,11 +3,13 @@
     const $board = $("#board");
     const $playerO = $("#player1");
     const $playerX = $("#player2");
+    let $startHTML;
     let $name1HTML;
     let $name2HTML;
 
+    // creates start screen
     function startScreen() {
-        const $startHTML = $("<div class='screen screen-start' id='start'>" +
+        $startHTML = $("<div class='screen screen-start' id='start'>" +
             "<header><h1>Tic Tac Toe</h1><div class='input'>" +
             "<input type='text' id='input1' placeholder='Enter 1st player name'></input>" +
             "<input type='text' id='input2' placeholder='Enter 2nd player name'></input>" +
@@ -22,22 +24,27 @@
         $("#input1").focus();
 
         $(".button").click(function () {
-            // store user inputs, creates p element to display them, and appends them to page
+            // stores player name inputs
             $nameInput1 = $("#input1").val().toUpperCase();
-            $name1HTML = $("<p>" + $nameInput1 + "</p>");
             $nameInput2 = $("#input2").val().toUpperCase();
+            // adds the name of computer to player 2 if left blank
+            if ($nameInput2 === "") {
+                $nameInput2 = "COMPUTER";
+            }
+
+            // creates p elements to display player names
+            $name1HTML = $("<p>" + $nameInput1 + "</p>");
             $name2HTML = $("<p>" + $nameInput2 + "</p>");
-            $playerX.prepend($name1HTML);
-            $playerO.prepend($name2HTML);
-            $startHTML.remove();
-            
+
+            // calls functions necessary to begin game
             randomizePlayer();
             beginGame();
         });
     }
 
+    // randomly determines which player plays X
     function randomizePlayer() {
-        let randomNumber = Math.floor(Math.random() * 100) +1;
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
 
         if (randomNumber % 2 === 0) {
             $playerX.prepend($name1HTML);
@@ -48,16 +55,21 @@
         }
     }
 
+    // removes start screen elements, shows game board and adds active class to player X
     function beginGame() {
+        $startHTML.remove();
         $board.show();
         $playerX.addClass("active");
     }
+    
+    function gamePlay() {
 
-    // call the start screen function on page load
-    startScreen();
+    }
 
     // hides game board by default
     $board.hide();
+    // call the start screen function on page load
+    startScreen();
 
 
 
