@@ -1,23 +1,30 @@
-// self-excuting function
+// self-executing function
 !function () {
-    const $board = $("#board");
-    const $playerO = $("#player1");
-    const $playerX = $("#player2");
     let $startHTML;
+    const $board = $("#board");
     let $name1HTML;
     let $name2HTML;
-    const $box = $(".box");
-    let $xMoves;
-    let $0Moves;
+    const $playerO = $("#player1");
+    const $playerX = $("#player2");
+    let moveNumber = 0
+    let xSquares = [];
+    let oSquares = [];
 
     // creates start screen
     function startScreen() {
-        $startHTML = $("<div class='screen screen-start' id='start'>" +
-            "<header><h1>Tic Tac Toe</h1><div class='input'>" +
-            "<input type='text' id='input1' placeholder='Enter 1st player name'></input>" +
-            "<input type='text' id='input2' placeholder='Enter 2nd player name'></input>" +
-            "<p>Leave 2nd player blank to play against the computer</p>" +
-            "</div><a href='#' class='button'>Start game</a></header></div>");
+        $startHTML = $(`
+            <div class='screen screen-start' id='start'>
+                <header>
+                <h1>Tic Tac Toe</h1>
+                <div class='input'>
+                    <input type='text' id='input1' placeholder='Enter 1st player name'></input>
+                    <input type='text' id='input2' placeholder='Enter 2nd player name'></input>
+                    <p>Leave 2nd player blank to play against the computer</p>
+                </div>
+                <a href='#' class='button'>Start game</a>
+                </header>
+            </div>
+            `);
         let $nameInput1;
         let $nameInput2;
 
@@ -32,7 +39,7 @@
             $nameInput2 = $("#input2").val().toUpperCase();
             // adds generic player name to player 1 if left blank
             if ($nameInput1 === "") {
-                $nameInput1 = "Player 1";
+                $nameInput1 = "PLAYER 1";
             }
             // adds the name of computer to player 2 if left blank
             if ($nameInput2 === "") {
@@ -40,8 +47,8 @@
             }
 
             // creates p elements to display player names
-            $name1HTML = $("<p>" + $nameInput1 + "</p>");
-            $name2HTML = $("<p>" + $nameInput2 + "</p>");
+            $name1HTML = $(`<p class="name1"> ${$nameInput1} </p>`);
+            $name2HTML = $(`<p class="name1"> ${$nameInput2} </p>`);
 
             // calls functions necessary to begin game
             randomizePlayer();
@@ -55,11 +62,11 @@
         let randomNumber = Math.floor(Math.random() * 100) + 1;
 
         if (randomNumber % 2 === 0) {
-            $playerX.prepend($name1HTML);
-            $playerO.prepend($name2HTML);
+            $playerX.append($name1HTML);
+            $playerO.append($name2HTML);
         } else {
-            $playerO.prepend($name1HTML);
-            $playerX.prepend($name2HTML);
+            $playerO.pappend($name1HTML);
+            $playerX.append($name2HTML);
         }
     }
 
@@ -72,6 +79,7 @@
 
     // shows active player's game piece when an empty square is hovered over
     function gamePlay() {
+        const $box = $(".box");
         $box.mouseover(function () {
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
@@ -96,10 +104,15 @@
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
                     $(this).addClass("box-filled-2");
+                    xSquares.push(this.id);
+                    moveNumber += 1;
+                    endCheck(xSquares, "two");
                     oActive();
-                    console.log(this.id);
                 } else if ($playerO.hasClass("active")) {
                     $(this).addClass("box-filled-1");
+                    oSquares.push(this.id);
+                    moveNumber += 1;
+                    endCheck(oSquares, "one");
                     xActive();
                 }
             }
@@ -116,12 +129,82 @@
         $playerO.addClass("active");
     }
 
-    function endCheck() {
-
+    function endCheck(activePlayer, activeNumber) {
+        let winner = false;
+        const $playerName = $(".active").find("p").text();
+        if (activePlayer.includes("one") && activePlayer.includes("two") && activePlayer.includes("three")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("four") && activePlayer.includes("five") && activePlayer.includes("six")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("seven") && activePlayer.includes("eight") && activePlayer.includes("nine")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("one") && activePlayer.includes("five") && activePlayer.includes("nine")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("three") && activePlayer.includes("five") && activePlayer.includes("seven")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("one") && activePlayer.includes("four") && activePlayer.includes("seven")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("two") && activePlayer.includes("five") && activePlayer.includes("eight")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        }
+        if (activePlayer.includes("three") && activePlayer.includes("six") && activePlayer.includes("nine")) {
+            winner = true;
+            winScreen($playerName, activeNumber);
+        } else if (moveNumber === 9 && winner === false) {
+            tieScreen();
+        }
     }
 
-    // hides game board by default
-    $board.hide();
+    function winScreen(name, playerNumber) {
+        const $winHTML = $(`
+            <div class="screen screen-win screen-win-${playerNumber}" id="finish">
+                <header><h1>Tic Tac Toe</h1>
+                    <p class="message"> ${name} wins!</p>
+                    <a href="#" class="button">New game</a>
+                </header>
+            </div>
+            `);
+
+        $board.remove();
+        $("body").append($winHTML);
+        newGame();
+    }
+
+    function tieScreen() {
+        const $tieHTML = $(`
+            <div class="screen screen-win screen-win-tie" id="finish">
+                <header>
+                    <h1>Tic Tac Toe</h1>
+                    <p class="message">It's a draw!</p>
+                    <a href="#" class="button">New game</a>
+                </header>
+            </div>
+            `);
+
+        $board.remove();
+        $("body").append($tieHTML);
+        newGame();
+    }
+
+    function newGame() {
+        $(".button").click(function () {
+            location.reload();
+        });
+    }
+
     // call the start screen function on page load
     startScreen();
 
