@@ -13,6 +13,7 @@
     const avail = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
     const corners = ["one", "three", "seven", "nine"];
     const centers = ["two", "four", "six", "eight"];
+    let winner = false;
 
     // creates start screen
     function startScreen() {
@@ -129,91 +130,163 @@
 
     function computerPlayer() {
         // creates a slight delay for computer moves
-        const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+        const delay = Math.floor(Math.random() * (2000 - 800 + 1)) + 800;
 
         function randomizer(array) {
             const square = Math.floor(Math.random() * array.length);
             return array[square];
         }
-
-        if ($("#player2").find("p").text() === "COMPUTER") {
-            if (moveNumber === 0) {
-                setTimeout(function () {
-                    const move = randomizer(corners);
-                    $(`#${move}`).addClass("box-filled-2");
-                    xSquares.push(move);
-                    avail.splice($.inArray(move, avail), 1);
-                    corners.splice($.inArray(move, avail), 1);
-                    moveNumber += 1;
-                    oActive();
-                }, delay);
-            }
-            if (moveNumber === 2) {
-                if (oSquares.includes("five")) {
+        if (!winner) {
+            if ($("#player2").find("p").text() === "COMPUTER") {
+                if (moveNumber === 0) {
                     setTimeout(function () {
                         const move = randomizer(corners);
-                        $(`#${move}`).addClass("box-filled-2");
+                        $(`#${move}`).addClass("box-filled-2").css("background-image", "url('img/x.svg')");
                         xSquares.push(move);
                         avail.splice($.inArray(move, avail), 1);
-                        corners.splice($.inArray(move, corners), 1);
+                        corners.splice($.inArray(move, avail), 1);
                         moveNumber += 1;
-                        oActive();
-                    }, delay);
-                } else if (!oSquares.includes("five")) {
-                    setTimeout(function () {
-                        const move = "five";
-                        $(`#${move}`).addClass("box-filled-2");
-                        xSquares.push(move);
-                        avail.splice($.inArray(move, avail), 1);
-                        moveNumber += 1;
-                        endCheck(xSquares, "two");
                         oActive();
                     }, delay);
                 }
-            }
-            if (moveNumber === 4) {
-                if (xSquares.includes("five") && xSquares.includes("one") && !oSquares.includes("nine"))
+                if (moveNumber === 2) {
+                    if (oSquares.includes("five")) {
+                        setTimeout(function () {
+                            const move = randomizer(corners);
+                            $(`#${move}`).addClass("box-filled-2").css("background-image", "url('img/x.svg')");
+                            xSquares.push(move);
+                            avail.splice($.inArray(move, avail), 1);
+                            corners.splice($.inArray(move, corners), 1);
+                            moveNumber += 1;
+                            oActive();
+                        }, delay);
+                    } else if (!oSquares.includes("five")) {
+                        setTimeout(function () {
+                            const move = "five";
+                            $(`#${move}`).addClass("box-filled-2").css("background-image", "url('img/x.svg')");
+                            xSquares.push(move);
+                            avail.splice($.inArray(move, avail), 1);
+                            moveNumber += 1;
+                            oActive();
+                        }, delay);
+                    }
+                }
+                if (moveNumber >= 4) {
                     setTimeout(function () {
-                        const move = "nine";
-                        $(`#${move}`).addClass("box-filled-2");
+                        const move = randomizer(avail);
+                        $(`#${move}`).addClass("box-filled-2").css("background-image", "url('img/x.svg')");
                         xSquares.push(move);
                         avail.splice($.inArray(move, avail), 1);
                         moveNumber += 1;
-                        oActive();
+                        setTimeout(function () {
+                            endCheck(xSquares, "two");
+                            oActive();
+                        }, 1000);
                     }, delay);
-            }
+                }
 
-            $box.mouseover(function () {
-                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
-                    if ($playerO.hasClass("active")) {
-                        $(this).css("background-image", "url('img/o.svg')");
+                $box.mouseover(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerO.hasClass("active")) {
+                            $(this).css("background-image", "url('img/o.svg')");
+                        }
+                    }
+                });
+                $box.mouseout(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerO.hasClass("active")) {
+                            $(this).css("background-image", "none");
+                        }
+                    }
+                });
+                $box.click(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerO.hasClass("active")) {
+                            $(this).addClass("box-filled-1");
+                            oSquares.push(this.id);
+                            avail.splice($.inArray(this.id, avail), 1);
+                            moveNumber += 1;
+                            setTimeout(function() {
+                                endCheck(oSquares, "one");
+                                xActive();
+                                computerPlayer();
+                            }, 500);
+                        }
+                    }
+                });
+            } else {
+                if (moveNumber === 1) {
+                    if (!xSquares.includes("five")) {
+                        setTimeout(function () {
+                            const move = "five";
+                            $(`#${move}`).addClass("box-filled-1").css("background-image", "url('img/o.svg')");
+                            oSquares.push(move);
+                            avail.splice($.inArray(move, avail), 1);
+                            moveNumber += 1;
+                            xActive();
+                        }, delay);
+                    } else {
+                        setTimeout(function () {
+                            const move = randomizer(avail);
+                            $(`#${move}`).addClass("box-filled-1").css("background-image", "url('img/o.svg')");
+                            oSquares.push(move);
+                            avail.splice($.inArray(move, avail), 1);
+                            moveNumber += 1;
+                            xActive();
+                        }, delay);
                     }
                 }
-            });
-            $box.mouseout(function () {
-                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
-                    if ($playerO.hasClass("active")) {
-                        $(this).css("background-image", "none");
-                    }
-                }
-            });
-            $box.click(function () {
-                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
-                    if ($playerO.hasClass("active")) {
-                        $(this).addClass("box-filled-1");
-                        oSquares.push(this.id);
-                        avail.splice($.inArray(this.id, avail), 1);
+                if (moveNumber >= 3) {
+                    setTimeout(function () {
+                        const move = randomizer(avail);
+                        $(`#${move}`).addClass("box-filled-1").css("background-image", "url('img/o.svg')");
+                        oSquares.push(move);
+                        avail.splice($.inArray(move, avail), 1);
                         moveNumber += 1;
-                        endCheck(oSquares, "one");
-                        xActive();
-                        computerPlayer();
-                        console.log(avail);
-                    }
+                        setTimeout(function () {
+                            endCheck(oSquares, "one");
+                            xActive();
+                        }, 1000);
+                    }, delay);
                 }
-            });
-        } else if ($("#player1").find("p").text() === " COMPUTER ") {
-            console.log("Computer is O");
+
+
+
+                $box.mouseover(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerX.hasClass("active")) {
+                            $(this).css("background-image", "url('img/x.svg')");
+                        }
+                    }
+                });
+                $box.mouseout(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerX.hasClass("active")) {
+                            $(this).css("background-image", "none");
+                        }
+                    }
+                });
+                $box.click(function () {
+                    if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                        if ($playerX.hasClass("active")) {
+                            $(this).addClass("box-filled-2");
+                            xSquares.push(this.id);
+                            avail.splice($.inArray(this.id, avail), 1);
+                            moveNumber += 1;
+                            setTimeout(function () {
+                                endCheck(xSquares, "two");
+                                oActive();
+                                computerPlayer();
+                            }, 500);
+                        }
+                    }
+                });
+            }
         }
+    }
+
+    function tryHard(player) {
+
     }
 
     function xActive() {
@@ -227,7 +300,6 @@
     }
 
     function endCheck(activePlayer, activeNumber) {
-        let winner = false;
         const $playerName = $(".active").find("p").text();
         if (activePlayer.includes("one") && activePlayer.includes("two") && activePlayer.includes("three")) {
             winner = true;
@@ -291,7 +363,7 @@
             </div>
             `);
 
-        $board.remove();
+        $board.hide();
         $("body").append($tieHTML);
         newGame();
     }
