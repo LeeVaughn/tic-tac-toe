@@ -6,9 +6,13 @@
     let $name2HTML;
     const $playerO = $("#player1");
     const $playerX = $("#player2");
+    const $box = $(".box");
     let moveNumber = 0
     let xSquares = [];
     let oSquares = [];
+    const avail = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    const corners = ["one", "three", "seven", "nine"];
+    const centers = ["two", "four", "six", "eight"];
 
     // creates start screen
     function startScreen() {
@@ -47,13 +51,18 @@
             }
 
             // creates p elements to display player names
-            $name1HTML = $(`<p class="name1"> ${$nameInput1} </p>`);
-            $name2HTML = $(`<p class="name1"> ${$nameInput2} </p>`);
+            $name1HTML = $(`<p class="name1">${$nameInput1}</p>`);
+            $name2HTML = $(`<p class="name2">${$nameInput2}</p>`);
 
-            // calls functions necessary to begin game
-            randomizePlayer();
-            beginGame();
-            gamePlay();
+            if ($nameInput2 === "COMPUTER") {
+                randomizePlayer();
+                beginGame();
+                computerPlayer();
+            } else {
+                randomizePlayer();
+                beginGame();
+                gamePlay();
+            }
         });
     }
 
@@ -65,7 +74,7 @@
             $playerX.append($name1HTML);
             $playerO.append($name2HTML);
         } else {
-            $playerO.pappend($name1HTML);
+            $playerO.append($name1HTML);
             $playerX.append($name2HTML);
         }
     }
@@ -79,7 +88,6 @@
 
     // shows active player's game piece when an empty square is hovered over
     function gamePlay() {
-        const $box = $(".box");
         $box.mouseover(function () {
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
@@ -117,6 +125,95 @@
                 }
             }
         });
+    }
+
+    function computerPlayer() {
+        // creates a slight delay for computer moves
+        const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+
+        function randomizer(array) {
+            const square = Math.floor(Math.random() * array.length);
+            return array[square];
+        }
+
+        if ($("#player2").find("p").text() === "COMPUTER") {
+            if (moveNumber === 0) {
+                setTimeout(function () {
+                    const move = randomizer(corners);
+                    $(`#${move}`).addClass("box-filled-2");
+                    xSquares.push(move);
+                    avail.splice($.inArray(move, avail), 1);
+                    corners.splice($.inArray(move, avail), 1);
+                    moveNumber += 1;
+                    oActive();
+                }, delay);
+            }
+            if (moveNumber === 2) {
+                if (oSquares.includes("five")) {
+                    setTimeout(function () {
+                        const move = randomizer(corners);
+                        $(`#${move}`).addClass("box-filled-2");
+                        xSquares.push(move);
+                        avail.splice($.inArray(move, avail), 1);
+                        corners.splice($.inArray(move, corners), 1);
+                        moveNumber += 1;
+                        oActive();
+                    }, delay);
+                } else if (!oSquares.includes("five")) {
+                    setTimeout(function () {
+                        const move = "five";
+                        $(`#${move}`).addClass("box-filled-2");
+                        xSquares.push(move);
+                        avail.splice($.inArray(move, avail), 1);
+                        moveNumber += 1;
+                        endCheck(xSquares, "two");
+                        oActive();
+                    }, delay);
+                }
+            }
+            if (moveNumber === 4) {
+                if (xSquares.includes("five") && xSquares.includes("one") && !oSquares.includes("nine"))
+                    setTimeout(function () {
+                        const move = "nine";
+                        $(`#${move}`).addClass("box-filled-2");
+                        xSquares.push(move);
+                        avail.splice($.inArray(move, avail), 1);
+                        moveNumber += 1;
+                        oActive();
+                    }, delay);
+            }
+
+            $box.mouseover(function () {
+                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                    if ($playerO.hasClass("active")) {
+                        $(this).css("background-image", "url('img/o.svg')");
+                    }
+                }
+            });
+            $box.mouseout(function () {
+                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                    if ($playerO.hasClass("active")) {
+                        $(this).css("background-image", "none");
+                    }
+                }
+            });
+            $box.click(function () {
+                if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
+                    if ($playerO.hasClass("active")) {
+                        $(this).addClass("box-filled-1");
+                        oSquares.push(this.id);
+                        avail.splice($.inArray(this.id, avail), 1);
+                        moveNumber += 1;
+                        endCheck(oSquares, "one");
+                        xActive();
+                        computerPlayer();
+                        console.log(avail);
+                    }
+                }
+            });
+        } else if ($("#player1").find("p").text() === " COMPUTER ") {
+            console.log("Computer is O");
+        }
     }
 
     function xActive() {
