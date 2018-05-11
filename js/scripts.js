@@ -12,36 +12,36 @@
     let oSquares = [];
     const avail = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
     const corners = ["one", "three", "seven", "nine"];
-    const centers = ["two", "four", "six", "eight"];
     let winner = false;
 
-    // creates start screen
     function startScreen() {
+        // creates start screen elements
         $startHTML = $(`
             <div class='screen screen-start' id='start'>
                 <header>
                 <h1>Tic Tac Toe</h1>
-                <div class='input'>
-                    <input type='text' id='input1' placeholder='Enter 1st player name'></input>
-                    <input type='text' id='input2' placeholder='Enter 2nd player name'></input>
-                    <p>Leave 2nd player blank to play against the computer</p>
+                <div class="input">
+                    <input type="text" id="input1" placeholder="Enter 1st player name"></input>
+                    <input type="text" id="input2" placeholder="Enter 2nd player name"></input>
+                    <p class="pve">Leave 2nd player blank to play against the computer</p>
                 </div>
-                <a href='#' class='button'>Start game</a>
+                <a href="#" class="button">Start game</a>
                 </header>
             </div>
             `);
         let $nameInput1;
         let $nameInput2;
 
-        // hides game board, appends start screen info, puts focus on first input field
+        // hides game board, prepends start screen info, puts focus on first input field
         $board.hide();
-        $("body").append($startHTML);
+        $("body").prepend($startHTML);
         $("#input1").focus();
 
         $(".button").click(function () {
             // stores player name inputs
             $nameInput1 = $("#input1").val().toUpperCase();
             $nameInput2 = $("#input2").val().toUpperCase();
+
             // adds generic player name to player 1 if left blank
             if ($nameInput1 === "") {
                 $nameInput1 = "PLAYER 1";
@@ -56,10 +56,12 @@
             $name2HTML = $(`<p class="name2">${$nameInput2}</p>`);
 
             if ($nameInput2 === "COMPUTER") {
+                // calls functions necessary to start game versus the computer
                 randomizePlayer();
                 beginGame();
                 computerPlayer();
             } else {
+                // calls functions necessary to start game versus two human players
                 randomizePlayer();
                 beginGame();
                 gamePlay();
@@ -67,7 +69,7 @@
         });
     }
 
-    // randomly determines which player plays X
+    // randomly determines which player plays as X and then appends player names
     function randomizePlayer() {
         let randomNumber = Math.floor(Math.random() * 100) + 1;
 
@@ -87,8 +89,9 @@
         $playerX.addClass("active");
     }
 
-    // shows active player's game piece when an empty square is hovered over
+    // functionality for human versus human
     function gamePlay() {
+        // shows active player's symbol when mousing over a square
         $box.mouseover(function () {
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
@@ -99,6 +102,7 @@
                 }
             }
         });
+        // removes active player's symbol when mouse leaves a square
         $box.mouseout(function () {
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
@@ -109,6 +113,7 @@
                 }
             }
         });
+        // if empty box is clicked, adds active player's symbol, and modifies variables and calls functions that track game progress
         $box.click(function () {
             if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                 if ($playerX.hasClass("active")) {
@@ -128,15 +133,19 @@
         });
     }
 
+    // functionality for playing versus the computer
     function computerPlayer() {
-        // creates a slight delay for computer moves
+        // creates a randomness to how long it takes the computer to make a move
         const delay = Math.floor(Math.random() * (2000 - 800 + 1)) + 800;
 
+        // used to randomize which square the computer chooses
         function randomizer(array) {
-            const square = Math.floor(Math.random() * array.length);
-            return array[square];
+            const selection = Math.floor(Math.random() * array.length);
+            return array[selection];
         }
+
         if (!winner) {
+            // functionality for when computer plays as X
             if ($("#player2").find("p").text() === "COMPUTER") {
                 if (moveNumber === 0) {
                     setTimeout(function () {
@@ -181,10 +190,11 @@
                         setTimeout(function () {
                             endCheck(xSquares, "two");
                             oActive();
-                        }, 1000);
+                        }, 500);
                     }, delay);
                 }
 
+                // functionality for human playing as O
                 $box.mouseover(function () {
                     if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                         if ($playerO.hasClass("active")) {
@@ -206,7 +216,7 @@
                             oSquares.push(this.id);
                             avail.splice($.inArray(this.id, avail), 1);
                             moveNumber += 1;
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 endCheck(oSquares, "one");
                                 xActive();
                                 computerPlayer();
@@ -215,6 +225,7 @@
                     }
                 });
             } else {
+                // functionality for computer playing as O
                 if (moveNumber === 1) {
                     if (!xSquares.includes("five")) {
                         setTimeout(function () {
@@ -246,12 +257,11 @@
                         setTimeout(function () {
                             endCheck(oSquares, "one");
                             xActive();
-                        }, 1000);
+                        }, 500);
                     }, delay);
                 }
 
-
-
+                // functionality for human playing as x
                 $box.mouseover(function () {
                     if (!$(this).hasClass("box-filled-1") && !$(this).hasClass("box-filled-2")) {
                         if ($playerX.hasClass("active")) {
@@ -285,10 +295,6 @@
         }
     }
 
-    function tryHard(player) {
-
-    }
-
     function xActive() {
         $playerO.removeClass("active");
         $playerX.addClass("active");
@@ -299,6 +305,7 @@
         $playerO.addClass("active");
     }
 
+    // takes an array listing which squares a player controls and the player number as arguments and checks if the game has been won or drawn
     function endCheck(activePlayer, activeNumber) {
         const $playerName = $(".active").find("p").text();
         if (activePlayer.includes("one") && activePlayer.includes("two") && activePlayer.includes("three")) {
@@ -337,6 +344,7 @@
         }
     }
 
+    // takes player name and number as arguments to create, append, and display winning game screen
     function winScreen(name, playerNumber) {
         const $winHTML = $(`
             <div class="screen screen-win screen-win-${playerNumber}" id="finish">
@@ -352,6 +360,7 @@
         newGame();
     }
 
+    // creates, appends, and displays tie game screen
     function tieScreen() {
         const $tieHTML = $(`
             <div class="screen screen-win screen-win-tie" id="finish">
@@ -368,6 +377,7 @@
         newGame();
     }
 
+    // resets game state when new game button is pressed on the win or tie screen
     function newGame() {
         $(".button").click(function () {
             location.reload();
@@ -376,9 +386,5 @@
 
     // call the start screen function on page load
     startScreen();
-
-
-
-
 
 }();
