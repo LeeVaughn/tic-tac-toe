@@ -15,6 +15,7 @@ This project was created as a part of the Treehouse Full Stack JavaScript Techde
 ## Future Improvements
 * Improve the play of the computer.
 * Allow the players to return directly to the game board and skip the start screen when they select play again from the end screen.
+* Separate some of the major functions into seperate JS files.
 
 ## Links
 * Project homepage: https://leevaughn.github.io/tic-tac-toe/
