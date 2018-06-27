@@ -46,7 +46,13 @@ h1 {
 }
 
 .button:hover {
-    color: #000;
+    transform: perspective(1px) scale(1.05);
+    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.4);
+}
+
+.button:active {
+    box-shadow: 4px 8px 15px 0 rgba(0, 0, 0, 0.6);
+    transform: translateY(4px);
 }
 
 .screen {
